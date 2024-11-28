@@ -29,7 +29,9 @@ function TodoCard(todoCardProps: TodoCardProps) {
                         {/* <div className="h-[2px] bg-gray-400"></div> */}
                         <div className="flex justify-end w-full 300:w-1/2">
                             {/* TODO: onclick delete */}
-                            <Button variant="destructive" className="w-full">
+                            <Button
+                                variant="destructive"
+                                className="w-full 700:w-[75%]">
                                 <X color="white" size={100} />
                             </Button>
                         </div>
