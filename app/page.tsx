@@ -1,3 +1,4 @@
+import MainTodoFetcher from "@/components/local/main_todo_fetcher";
 import TodoCard from "@/components/local/todo_card";
 import TodoInput from "@/components/local/todo_input";
 import React from "react";
@@ -12,10 +13,7 @@ function HomePage() {
                 <TodoInput />
             </div>
             <div className="w-[75%] mx-auto">
-                <TodoCard
-                    completed
-                    title="hello sfdjs adf asdfksadjlf asd fajk sd aff"
-                />
+                <MainTodoFetcher />
             </div>
         </div>
     );
