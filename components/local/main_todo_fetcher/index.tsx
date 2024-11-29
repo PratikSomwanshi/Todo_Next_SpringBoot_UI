@@ -1,15 +1,21 @@
 "use client";
 import React from "react";
 import TodoCard from "../todo_card";
-import axios from "axios";
 import useSWR from "swr";
-import { GeneralResponse, ITodo } from "@/lib/interfaces";
 import { fetchTodo } from "@/actions/todo";
+import SkeletonCard from "../skeleton_card";
 
 function MainTodoFetcher() {
     const { data: todos, isLoading, error } = useSWR("get-all-todo", fetchTodo);
 
-    if (isLoading) return <div>Loading...</div>;
+    if (isLoading)
+        return (
+            <div className="space-y-2">
+                {Array.from({ length: 5 }).map((_, i) => {
+                    return <SkeletonCard key={i} />;
+                })}
+            </div>
+        );
 
     if (error) return <div>Error...</div>;
 
