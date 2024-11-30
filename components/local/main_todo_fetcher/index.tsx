@@ -21,16 +21,22 @@ function MainTodoFetcher() {
 
     return (
         <div className="space-y-2">
-            {todos?.data.map((todo) => {
-                return (
-                    <TodoCard
-                        key={todo.id}
-                        id={todo.id}
-                        title={todo.title}
-                        completed={todo.completed}
-                    />
-                );
-            })}
+            {todos?.data && todos?.data.length > 0 ? (
+                todos?.data.map((todo) => {
+                    return (
+                        <TodoCard
+                            key={todo.id}
+                            id={todo.id}
+                            title={todo.title}
+                            completed={todo.completed}
+                        />
+                    );
+                })
+            ) : (
+                <div className="text-center mt-40 text-3xl font-medium">
+                    No todos
+                </div>
+            )}
         </div>
     );
 }
