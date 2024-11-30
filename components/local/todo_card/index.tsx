@@ -2,7 +2,12 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { X } from "lucide-react";
-import React, { ChangeEvent, useState } from "react";
+import React, {
+    ChangeEvent,
+    KeyboardEvent,
+    KeyboardEventHandler,
+    useState,
+} from "react";
 import { ITodo } from "../../../lib/interfaces";
 import Spinner from "../spinner";
 import { mutate } from "swr";
@@ -27,7 +32,7 @@ function TodoCard({ title, completed, id }: ITodo) {
     const { trigger: deleteTrigger, isMutating: deleteMutating } =
         useSWRMutation("delete-todo", deleteTodo);
 
-    async function handleCheck(e: ChangeEvent<HTMLInputElement>) {
+    async function handleCheck() {
         setChecked(!checked);
 
         trigger({
@@ -43,6 +48,13 @@ function TodoCard({ title, completed, id }: ITodo) {
 
         await mutate("get-all-todo");
         toast.success("Todo deleted");
+    }
+
+    async function handleClick(e: KeyboardEvent<HTMLInputElement>) {
+        console.log(e.key);
+        if (e.key === "Enter") await handleDelete();
+
+        if (!title) toast.error("Title can not be empty");
     }
 
     return (

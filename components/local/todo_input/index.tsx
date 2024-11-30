@@ -2,7 +2,7 @@
 import { addTodo } from "@/actions/todo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import React from "react";
+import React, { KeyboardEvent } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
 import useSWRMutation from "swr/mutation";
@@ -12,7 +12,6 @@ function TodoInput() {
 
     const { data, isMutating, trigger } = useSWRMutation("add-todo", addTodo, {
         onSuccess: (data) => {
-            console.log(data);
             mutate("get-all-todo");
             toast.success("Todo added successfully");
             setTitle("");
@@ -32,6 +31,14 @@ function TodoInput() {
         await trigger({ title });
     }
 
+    async function handleEnterClick(e: KeyboardEvent<HTMLInputElement>) {
+        if (!title) {
+            return toast.error("Title is required");
+        }
+
+        if (e.key == "Enter") await handleClick();
+    }
+
     return (
         <div className="py-10 w-full flex justify-center">
             <div className="700:flex w-full  items-center space-y-2 700:space-y-0 700:space-x-2">
@@ -40,6 +47,7 @@ function TodoInput() {
                     placeholder="Start typing here..."
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
+                    onKeyUp={handleEnterClick}
                 />
                 <Button
                     type="submit"
