@@ -6,7 +6,15 @@ import { fetchTodo } from "@/actions/todo";
 import SkeletonCard from "../skeleton_card";
 
 function MainTodoFetcher() {
-    const { data: todos, isLoading, error } = useSWR("get-all-todo", fetchTodo);
+    const {
+        data: todos,
+        isLoading,
+        error,
+    } = useSWR("get-all-todo", fetchTodo, {
+        onError: (error) => {
+            console.log("error " + error);
+        },
+    });
 
     if (isLoading)
         return (

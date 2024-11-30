@@ -1,10 +1,23 @@
 "use server";
 
 import { GeneralResponse, ITodo } from "@/lib/interfaces";
+import { getSession } from "@/utils/ironSessionConfig";
 import axios from "axios";
 
 export async function fetchTodo(): Promise<GeneralResponse<ITodo[]>> {
-    return (await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}`)).data;
+    const { token } = await getSession();
+    console.log("token " + token);
+
+    const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/todo`, {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    console.log("data " + res.data);
+
+    return res.data;
 }
 
 export async function updateTodo(
