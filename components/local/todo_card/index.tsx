@@ -24,30 +24,50 @@ function TodoCard({ title, completed, id }: ITodo) {
     const [checked, setChecked] = useState<boolean>(completed);
 
     const { trigger, isMutating } = useSWRMutation("update-todo", updateTodo, {
-        onError: (error) => {
-            const apiError: {
-                code: string;
-            } = JSON.parse(error.message);
+        onSuccess: (data) => {
+            if (!data.success && data.error.code) {
+                if (isSessionExpired(data.error.code)) {
+                    setIsAuthenticationExpired(true);
+                    setChecked(checked);
+                    return;
+                }
 
-            if (apiError.code && isSessionExpired(apiError.code)) {
-                setIsAuthenticationExpired(true);
+                toast.error("Failed to update todo");
                 setChecked(checked);
                 return;
-            }
-
-            toast.error("Failed to update todo");
-            setChecked(checked);
-        },
-        onSuccess: (data) => {
-            mutate("get-all-todo");
-            if (!isAuthenticationExpired) {
+            } else if (data.success) {
                 toast.success("Todo updated");
+            } else {
+                toast.error(data.error.explanation || "Failed to update todo");
+                setChecked(checked);
             }
         },
     });
 
     const { trigger: deleteTrigger, isMutating: deleteMutating } =
-        useSWRMutation("delete-todo", deleteTodo);
+        useSWRMutation("delete-todo", deleteTodo, {
+            onSuccess: (data) => {
+                if (!data.success && data.error.code) {
+                    if (isSessionExpired(data.error.code)) {
+                        setIsAuthenticationExpired(true);
+                        setChecked(checked);
+                        return;
+                    }
+
+                    toast.error("Failed to update todo");
+                    setChecked(checked);
+                    return;
+                } else if (data.success && !isAuthenticationExpired) {
+                    mutate("get-all-todo");
+                    toast.success("Todo updated");
+                } else {
+                    toast.error(
+                        data.error.explanation || "Failed to delete todo"
+                    );
+                    setChecked(checked);
+                }
+            },
+        });
 
     async function handleCheck() {
         setChecked(!checked);

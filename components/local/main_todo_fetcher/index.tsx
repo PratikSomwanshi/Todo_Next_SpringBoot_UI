@@ -20,18 +20,29 @@ function MainTodoFetcher() {
 
     const [error, setError] = React.useState("");
 
-    const { data: todos, isLoading } = useSWR("get-all-todo", fetchTodo, {
+    const {
+        data: todos,
+        isLoading,
+        isValidating,
+    } = useSWR("get-all-todo", fetchTodo, {
         onSuccess: (error) => {
             if (!error.success && error.error.code) {
                 if (isSessionExpired(error.error.code)) {
                     setIsAuthenticationExpired(true);
                     return;
                 }
+            } else if (error.success) {
+                // mutate("get-all-todo");
+            } else {
+                setError(error.error.message);
+                toast.error("Failed to fetch the data");
             }
-
-            setError(error.error.message);
-            toast.error("Failed to fetch the data");
         },
+        revalidateOnMount: true,
+        refreshWhenHidden: false,
+        revalidateIfStale: false,
+        revalidateOnFocus: false,
+        refreshInterval: 0,
     });
 
     if (isLoading)
@@ -57,22 +68,30 @@ function MainTodoFetcher() {
 
     return (
         <div className="space-y-2">
-            {todos?.data && todos?.data.length > 0 ? (
-                todos?.data.map((todo: ITodo) => {
-                    return (
-                        <TodoCard
-                            key={todo.id}
-                            id={todo.id}
-                            title={todo.title}
-                            completed={todo.completed}
-                        />
-                    );
-                })
-            ) : (
-                <div className="text-center mt-40 text-3xl font-medium">
-                    No todos
-                </div>
-            )}
+            {todos?.data &&
+                (todos?.data.length > 0 ? (
+                    todos?.data.map((todo: ITodo) => {
+                        return (
+                            <TodoCard
+                                key={todo.id}
+                                id={todo.id}
+                                title={todo.title}
+                                completed={todo.completed}
+                            />
+                        );
+                    })
+                ) : !isValidating ? (
+                    <div className="text-center mt-40 text-3xl font-medium">
+                        No todos
+                        {todos?.data.length}
+                    </div>
+                ) : (
+                    <div className="space-y-2">
+                        {Array.from({ length: 5 }).map((_, i) => {
+                            return <SkeletonCard key={i} />;
+                        })}
+                    </div>
+                ))}
         </div>
     );
 }

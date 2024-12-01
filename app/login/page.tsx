@@ -9,6 +9,7 @@ import { FormInput } from "@/lib/interfaces";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { mutate } from "swr";
 import useSWRMutation from "swr/mutation";
 
 function LoginPage() {
@@ -24,6 +25,7 @@ function LoginPage() {
         onSuccess: (data) => {
             if (data.success) {
                 setIsAuthenticationExpired(false);
+
                 router.push("/");
             }
         },

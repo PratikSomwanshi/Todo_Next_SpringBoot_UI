@@ -2,24 +2,40 @@
 import { addTodo } from "@/actions/todo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import useGlobalContext from "@/hooks/useContext";
+import { isSessionExpired } from "@/utils/isJWTExpired";
 import React, { KeyboardEvent } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
 import useSWRMutation from "swr/mutation";
 
 function TodoInput() {
+    const { setIsAuthenticationExpired, isAuthenticationExpired } =
+        useGlobalContext();
     const [title, setTitle] = React.useState("");
 
-    const { data, isMutating, trigger } = useSWRMutation("add-todo", addTodo, {
+    const { isMutating, trigger } = useSWRMutation("add-todo", addTodo, {
         onSuccess: (data) => {
             mutate("get-all-todo");
             toast.success("Todo added successfully");
             setTitle("");
-        },
-        onError: (error) => {
-            console.log(error);
-            toast.error("Failed to add todo");
-            setTitle("");
+
+            if (!data.success && data.error.code) {
+                if (isSessionExpired(data.error.code)) {
+                    setIsAuthenticationExpired(true);
+                    return;
+                }
+
+                toast.error(data.error.explanation);
+                return;
+            } else if (data.success) {
+                if (!isAuthenticationExpired) {
+                    toast.success("Todo updated");
+                    setTitle("");
+                }
+            } else {
+                toast.error("Failed to add todo");
+            }
         },
     });
 
