@@ -10,29 +10,27 @@ import TodoCard from "@/components/local/todo_card";
 import SessionExpiredModel from "@/components/local/session_expired_model";
 
 import useGlobalContext from "@/hooks/useContext";
-import { TokenErrorCode } from "@/utils/enums";
+import { toast } from "sonner";
+import { isSessionExpired } from "@/utils/isJWTExpired";
+import { ITodo } from "@/lib/interfaces";
 
 function MainTodoFetcher() {
     const { isAuthenticationExpired, setIsAuthenticationExpired } =
         useGlobalContext();
 
-    const {
-        data: todos,
-        isLoading,
-        error,
-    } = useSWR("get-all-todo", fetchTodo, {
-        onError: (error) => {
-            const parsedError: {
-                code: string;
-            } = JSON.parse(error.message);
+    const [error, setError] = React.useState("");
 
-            if (
-                parsedError.code === TokenErrorCode.EXPIRED ||
-                parsedError.code === TokenErrorCode.INVALID ||
-                parsedError.code === TokenErrorCode.NOT_FOUND
-            ) {
-                setIsAuthenticationExpired(true);
+    const { data: todos, isLoading } = useSWR("get-all-todo", fetchTodo, {
+        onSuccess: (error) => {
+            if (!error.success && error.error.code) {
+                if (isSessionExpired(error.error.code)) {
+                    setIsAuthenticationExpired(true);
+                    return;
+                }
             }
+
+            setError(error.error.message);
+            toast.error("Failed to fetch the data");
         },
     });
 
@@ -45,7 +43,7 @@ function MainTodoFetcher() {
             </div>
         );
 
-    if (error && !isAuthenticationExpired && !todos?.data[0]) {
+    if (error && !isAuthenticationExpired) {
         return (
             <div>
                 <span>Failed to Fetch the Data</span>
@@ -60,7 +58,7 @@ function MainTodoFetcher() {
     return (
         <div className="space-y-2">
             {todos?.data && todos?.data.length > 0 ? (
-                todos?.data.map((todo) => {
+                todos?.data.map((todo: ITodo) => {
                     return (
                         <TodoCard
                             key={todo.id}

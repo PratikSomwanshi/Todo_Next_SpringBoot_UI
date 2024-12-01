@@ -10,65 +10,61 @@ async function getToken() {
     return token;
 }
 
-export async function fetchTodo(): Promise<GeneralResponse<ITodo[]>> {
+export async function fetchTodo() {
     // console.log("token " + token);
 
-    console.log(`${process.env.NEXT_PUBLIC_BACKEND_URL}/todo`);
+    try {
+        const token = await getToken();
 
-    const token = await getToken();
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/todo`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/todo`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
+        const data = await res.json();
 
-    const data = await res.json();
+        if (!res.ok) {
+            throw data;
+        }
 
-    if (!res.ok) {
-        const apiError = JSON.stringify(data.error);
-
-        throw new Error(apiError);
+        return data;
+    } catch (data) {
+        console.log(data);
+        return data;
     }
-
-    return data;
 }
 
 export async function updateTodo(
     key: string,
     { arg }: { arg: { id: string; completed: boolean } } // We now expect `arg` to contain the data
 ) {
-    const token = await getToken();
+    try {
+        const token = await getToken();
 
-    const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/todo?id=${arg.id}`,
-        {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ completed: arg.completed }),
-        }
-    );
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/todo?id=${arg.id}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ completed: arg.completed }),
+            }
+        );
 
-    const data = await response.json();
+        const data = await response.json();
 
-    if (!response.ok) {
-        if (
-            data.error.code == TokenErrorCode.EXPIRED ||
-            data.error.code == TokenErrorCode.INVALID ||
-            data.error.code == TokenErrorCode.NOT_FOUND
-        ) {
-            const apiError = JSON.stringify(data.error);
-
-            throw new Error(apiError);
+        if (!response.ok) {
+            throw data;
         }
 
-        throw new Error("Error updating todo");
+        return data;
+    } catch (data) {
+        console.log(data);
+        return data;
     }
-
-    return data;
 }
 
 export async function deleteTodo(
