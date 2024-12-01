@@ -5,11 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import useGlobalContext from "@/hooks/useContext";
-import { FormInput, loginData } from "@/lib/interfaces";
+import { FormInput } from "@/lib/interfaces";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { set, SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { SubmitHandler, useForm } from "react-hook-form";
 import useSWRMutation from "swr/mutation";
 
 function LoginPage() {
@@ -18,25 +17,17 @@ function LoginPage() {
     const { setIsAuthenticationExpired } = useGlobalContext();
     const [apiError, setApiError] = React.useState<string | null>(null);
 
-    const { data, error, isMutating, trigger } = useSWRMutation(
-        "login",
-        login,
-        {
-            onError: (error) => {
-                console.log(error.message);
-                setApiError(error.message);
-            },
-            onSuccess: (data) => {
-                console.log(data);
-                toast.success("Login successful");
-
-                if (data.success) {
-                    setIsAuthenticationExpired(false);
-                    router.push("/");
-                }
-            },
-        }
-    );
+    const { isMutating, trigger } = useSWRMutation("login", login, {
+        onError: (error) => {
+            setApiError(error.message);
+        },
+        onSuccess: (data) => {
+            if (data.success) {
+                setIsAuthenticationExpired(false);
+                router.push("/");
+            }
+        },
+    });
 
     const {
         register,
