@@ -5,12 +5,12 @@ import React, { createContext, useState } from "react";
 export const GlobalContext = createContext<GlobalContextType | null>(null);
 
 function UtilityProvider({ children }: { children: React.ReactNode }) {
-    const [username, setUsername] = useState("");
-    const [email, setEmail] = useState("");
+    const [isAuthenticationExpired, setIsAuthenticationExpired] =
+        useState(false);
 
     return (
         <GlobalContext.Provider
-            value={{ username, email, setUsername, setEmail }}>
+            value={{ isAuthenticationExpired, setIsAuthenticationExpired }}>
             {children}
         </GlobalContext.Provider>
     );

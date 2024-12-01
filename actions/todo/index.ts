@@ -6,18 +6,26 @@ import axios from "axios";
 
 export async function fetchTodo(): Promise<GeneralResponse<ITodo[]>> {
     const { token } = await getSession();
-    console.log("token " + token);
+    // console.log("token " + token);
 
-    const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/todo`, {
+    console.log(`${process.env.NEXT_PUBLIC_BACKEND_URL}/todo`);
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/todo`, {
         headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
     });
 
-    console.log("data " + res.data);
+    const data = await res.json();
 
-    return res.data;
+    if (!res.ok) {
+        const apiError = JSON.stringify(data.error);
+
+        throw new Error(apiError);
+    }
+
+    console.log(data);
+    return data;
 }
 
 export async function updateTodo(

@@ -14,10 +14,8 @@ export interface GeneralResponse<T> {
 }
 
 export interface GlobalContextType {
-    username: string;
-    email: string;
-    setUsername: (value: string) => void;
-    setEmail: (value: string) => void;
+    isAuthenticationExpired: boolean;
+    setIsAuthenticationExpired: (value: boolean) => void;
 }
 
 // form interface

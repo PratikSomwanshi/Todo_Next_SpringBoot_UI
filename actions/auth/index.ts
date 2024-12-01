@@ -30,7 +30,7 @@ export const login = async (
         session.token = res.data[0].token;
         session.isLoggedIn = true;
         await session.save();
-        redirect("/");
+        return res;
     }
 
     throw new Error(res.error.explanation || "Something went wrong");
