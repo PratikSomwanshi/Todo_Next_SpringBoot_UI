@@ -1,6 +1,5 @@
 "use server";
 import { getSession } from "@/utils/ironSessionConfig";
-import { redirect } from "next/navigation";
 
 export const login = async (
     key: string,
@@ -24,7 +23,6 @@ export const login = async (
 
     const res = await response.json();
 
-    console.log(res);
     if (response.ok) {
         session.username = res.username;
         session.token = res.data[0].token;

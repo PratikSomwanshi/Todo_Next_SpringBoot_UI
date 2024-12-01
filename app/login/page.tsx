@@ -1,5 +1,6 @@
 "use client";
 import { login } from "@/actions/auth";
+import Spinner from "@/components/local/spinner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -90,7 +91,7 @@ function LoginPage() {
                                 </span>
                             </div>
                             <Button className="btn" type="submit">
-                                Login
+                                {isMutating ? <Spinner size={20} /> : "Login"}
                             </Button>
                         </div>
                     </form>
