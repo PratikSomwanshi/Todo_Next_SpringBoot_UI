@@ -10,6 +10,7 @@ import TodoCard from "@/components/local/todo_card";
 import SessionExpiredModel from "@/components/local/session_expired_model";
 
 import useGlobalContext from "@/hooks/useContext";
+import { TokenErrorCode } from "@/utils/enums";
 
 function MainTodoFetcher() {
     const { isAuthenticationExpired, setIsAuthenticationExpired } =
@@ -26,9 +27,9 @@ function MainTodoFetcher() {
             } = JSON.parse(error.message);
 
             if (
-                parsedError.code === "TOKEN_EXPIRED" ||
-                parsedError.code === "TOKEN_INVALID" ||
-                parsedError.code === "TOKEN_NOT_FOUND"
+                parsedError.code === TokenErrorCode.EXPIRED ||
+                parsedError.code === TokenErrorCode.INVALID ||
+                parsedError.code === TokenErrorCode.NOT_FOUND
             ) {
                 setIsAuthenticationExpired(true);
             }
@@ -44,8 +45,13 @@ function MainTodoFetcher() {
             </div>
         );
 
-    if (error && !isAuthenticationExpired)
-        return <div>{JSON.stringify(error)}</div>;
+    if (error && !isAuthenticationExpired && !todos?.data[0]) {
+        return (
+            <div>
+                <span>Failed to Fetch the Data</span>
+            </div>
+        );
+    }
 
     if (isAuthenticationExpired) {
         return <SessionExpiredModel />;

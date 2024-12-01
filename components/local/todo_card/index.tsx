@@ -14,18 +14,35 @@ import { mutate } from "swr";
 import useSWRMutation from "swr/mutation";
 import { deleteTodo, updateTodo } from "@/actions/todo";
 import { toast } from "sonner";
+import { isSessionExpired } from "@/utils/isJWTExpired";
+import useGlobalContext from "@/hooks/useContext";
 
 function TodoCard({ title, completed, id }: ITodo) {
+    const { setIsAuthenticationExpired, isAuthenticationExpired } =
+        useGlobalContext();
+
     const [checked, setChecked] = useState<boolean>(completed);
 
     const { trigger, isMutating } = useSWRMutation("update-todo", updateTodo, {
         onError: (error) => {
+            const apiError: {
+                code: string;
+            } = JSON.parse(error.message);
+
+            if (apiError.code && isSessionExpired(apiError.code)) {
+                setIsAuthenticationExpired(true);
+                setChecked(checked);
+                return;
+            }
+
             toast.error("Failed to update todo");
             setChecked(checked);
         },
         onSuccess: (data) => {
             mutate("get-all-todo");
-            toast.success("Todo updated");
+            if (!isAuthenticationExpired) {
+                toast.success("Todo updated");
+            }
         },
     });
 

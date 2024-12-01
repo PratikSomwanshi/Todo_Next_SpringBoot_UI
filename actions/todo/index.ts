@@ -1,6 +1,7 @@
 "use server";
 
 import { GeneralResponse, ITodo } from "@/lib/interfaces";
+import { TokenErrorCode } from "@/utils/enums";
 import { getSession } from "@/utils/ironSessionConfig";
 import axios from "axios";
 
@@ -30,7 +31,6 @@ export async function fetchTodo(): Promise<GeneralResponse<ITodo[]>> {
         throw new Error(apiError);
     }
 
-    console.log(data);
     return data;
 }
 
@@ -38,31 +38,37 @@ export async function updateTodo(
     key: string,
     { arg }: { arg: { id: string; completed: boolean } } // We now expect `arg` to contain the data
 ) {
-    try {
-        const token = await getToken();
+    const token = await getToken();
 
-        const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/todo?id=${arg.id}`,
-            {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ completed: arg.completed }),
-            }
-        );
+    const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/todo?id=${arg.id}`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ completed: arg.completed }),
+        }
+    );
 
-        if (!response.ok) {
-            throw new Error("Error updating todo");
+    const data = await response.json();
+
+    if (!response.ok) {
+        if (
+            data.error.code == TokenErrorCode.EXPIRED ||
+            data.error.code == TokenErrorCode.INVALID ||
+            data.error.code == TokenErrorCode.NOT_FOUND
+        ) {
+            const apiError = JSON.stringify(data.error);
+
+            throw new Error(apiError);
         }
 
-        const data = await response.json();
-
-        return data;
-    } catch (error: any) {
-        throw new Error(error.message);
+        throw new Error("Error updating todo");
     }
+
+    return data;
 }
 
 export async function deleteTodo(
