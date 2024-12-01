@@ -24,8 +24,9 @@ export const login = async (
     const res = await response.json();
 
     if (response.ok) {
-        session.username = res.username;
+        session.username = res.data[0].username;
         session.token = res.data[0].token;
+        session.email = res.data[0].email;
         session.isLoggedIn = true;
         await session.save();
         return res;

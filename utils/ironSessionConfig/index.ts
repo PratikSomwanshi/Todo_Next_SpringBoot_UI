@@ -8,7 +8,7 @@ export const defaultSession: SessionData = {
 
 export const sessionOptions: SessionOptions = {
     password: "uNN{&>(p._,WRmG3O1D!0$80#N!5OI&R",
-    cookieName: "yo_auction_secrets",
+    cookieName: "simple_todo_app",
     cookieOptions: {
         httpOnly: true,
         secure: false,
