@@ -1,5 +1,4 @@
 import MainTodoFetcher from "@/components/local/main_todo_fetcher";
-import TodoCard from "@/components/local/todo_card";
 import TodoInput from "@/components/local/todo_input";
 import { getSession } from "@/utils/ironSessionConfig";
 import React from "react";
