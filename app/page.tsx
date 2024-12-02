@@ -1,4 +1,5 @@
 import MainTodoFetcher from "@/components/local/main_todo_fetcher";
+import PublicHomePage from "@/components/local/public_home_page";
 import TodoInput from "@/components/local/todo_input";
 import { getSession } from "@/utils/ironSessionConfig";
 import React from "react";
@@ -7,7 +8,11 @@ async function HomePage() {
     const session = await getSession();
 
     if (!session.isLoggedIn) {
-        return <div>Not logged in</div>;
+        return (
+            <div>
+                <PublicHomePage />
+            </div>
+        );
     }
 
     return (

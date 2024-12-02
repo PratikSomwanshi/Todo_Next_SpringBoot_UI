@@ -53,13 +53,9 @@ function TodoCard({ title, completed, id }: ITodo) {
                         setChecked(checked);
                         return;
                     }
-
-                    toast.error("Failed to update todo");
-                    setChecked(checked);
-                    return;
                 } else if (data.success && !isAuthenticationExpired) {
                     mutate("get-all-todo");
-                    toast.success("Todo updated");
+                    toast.success("Todo deleted");
                 } else {
                     toast.error(
                         data.error.explanation || "Failed to delete todo"
@@ -82,9 +78,6 @@ function TodoCard({ title, completed, id }: ITodo) {
         await deleteTrigger({
             id,
         });
-
-        await mutate("get-all-todo");
-        toast.success("Todo deleted");
     }
 
     async function handleClick(e: KeyboardEvent<HTMLInputElement>) {

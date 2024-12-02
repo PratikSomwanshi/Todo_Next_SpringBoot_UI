@@ -21,10 +21,6 @@ function TodoInput() {
                 return;
             }
 
-            mutate("get-all-todo");
-            toast.success("Todo added successfully");
-            setTitle("");
-
             if (!data.success && data.error.code) {
                 if (isSessionExpired(data.error.code)) {
                     setIsAuthenticationExpired(true);
@@ -35,7 +31,8 @@ function TodoInput() {
                 return;
             } else if (data.success) {
                 if (!isAuthenticationExpired) {
-                    toast.success("Todo updated");
+                    toast.success("Todo added successfully");
+                    mutate("get-all-todo");
                     setTitle("");
                 }
             } else {

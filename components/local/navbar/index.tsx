@@ -7,6 +7,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
+import { logout } from "@/actions/auth";
 
 async function Navbar() {
     const session = await getSession();
@@ -29,7 +30,9 @@ async function Navbar() {
                         </PopoverTrigger>
                         <PopoverContent className="w-36">
                             <div className="w-full">
-                                <Button className="w-full">logout</Button>
+                                <Button className="w-full" onClick={logout}>
+                                    logout
+                                </Button>
                             </div>
                         </PopoverContent>
                     </Popover>

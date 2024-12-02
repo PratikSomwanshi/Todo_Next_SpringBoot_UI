@@ -34,3 +34,8 @@ export const login = async (
 
     throw new Error(res.error.explanation || "Something went wrong");
 };
+
+export const logout = async () => {
+    const session = await getSession();
+    session.destroy();
+};
