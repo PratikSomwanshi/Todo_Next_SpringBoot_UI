@@ -26,11 +26,19 @@ function MainTodoFetcher() {
         isValidating,
     } = useSWR("get-all-todo", fetchTodo, {
         onSuccess: (error) => {
+            console.log(error);
+            if (error.message == "fetch failed") {
+                setError("Internal Server Error");
+                return;
+            }
             if (!error.success && error.error.code) {
                 if (isSessionExpired(error.error.code)) {
                     setIsAuthenticationExpired(true);
                     return;
                 }
+
+                setError(error.error.message);
+                toast.error("Failed to fetch the data");
             } else if (error.success) {
                 // mutate("get-all-todo");
             } else {
@@ -54,10 +62,13 @@ function MainTodoFetcher() {
             </div>
         );
 
-    if (error && !isAuthenticationExpired) {
+    if (error) {
         return (
-            <div>
-                <span>Failed to Fetch the Data</span>
+            <div className="flex flex-col text-center justify-center h-56 text-red-400">
+                <span className="text-2xl font-semibold">
+                    Failed to Fetch the Data
+                </span>
+                <span className="text-xl">{error}</span>
             </div>
         );
     }

@@ -16,6 +16,11 @@ function TodoInput() {
 
     const { isMutating, trigger } = useSWRMutation("add-todo", addTodo, {
         onSuccess: (data) => {
+            if (data.message == "fetch failed") {
+                toast.error("Failed to add data");
+                return;
+            }
+
             mutate("get-all-todo");
             toast.success("Todo added successfully");
             setTitle("");

@@ -20,6 +20,11 @@ function LoginPage() {
 
     const { isMutating, trigger } = useSWRMutation("login", login, {
         onError: (error) => {
+            if ((error.message = "fetch failed")) {
+                setApiError("Unable to connect to server");
+                return;
+            }
+
             setApiError(error.message);
         },
         onSuccess: (data) => {
